@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+*.log
+*.sqlite3
+*.db
+
+# VSCode
+.vscode/
+
+# 环境/依赖
+.env
+.venv
+venv/
+ENV/
+
+# PyInstaller
+build/
+dist/
+*.spec
+*.exe
+*.dll
+*.app
+*.dmg
+*.pkg
+*.deb
+*.rpm
+*.tar.gz
+*.whl
+
+# 临时文件
+*.tmp
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# 其他
+.idea/
+*.bak
+*.old
+
+# 你可以根据实际情况补充更多忽略项
