@@ -31,6 +31,7 @@ jobs:
           pip install pyinstaller
 
       - name: Build executable
+        shell: bash
         run: |
           # 设置系统名
           if [[ "${{ runner.os }}" == "Windows" ]]; then
