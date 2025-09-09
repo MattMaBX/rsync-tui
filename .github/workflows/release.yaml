@@ -6,7 +6,7 @@ permissions:
 on:
   push:
     tags:
-      - 'v*'   # 例如 v1.0.0
+      - 'v*'  # 例如 v1.0.0
 
 jobs:
   build:
@@ -35,7 +35,7 @@ jobs:
         run: |
           echo "Runner OS: ${{ runner.os }}"
           
-          # 根据平台设置系统名和扩展名
+          # 设置系统名和扩展名
           if [[ "${{ runner.os }}" == "Windows" ]]; then
             SYSNAME=windows
             EXT=.exe
@@ -47,20 +47,22 @@ jobs:
             EXT=
           fi
 
-          # 用 PyInstaller 打包
+          # 打包
           pyinstaller --onefile rsync-tui.py
 
-          # 带系统名和 tag 重命名
+          # 获取 tag 名
           TAG_NAME=${GITHUB_REF##*/}
+
+          # 重命名可执行文件
           mv dist/rsync-tui${EXT} dist/rsync-tui-${SYSNAME}-${TAG_NAME}${EXT}
 
-          # 显示结果
+          # 显示 dist 内容
           ls -l dist
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: rsync-tui-${{ runner.os }}
+          name: rsync-tui
           path: dist/rsync-tui-*
 
   release:
@@ -70,11 +72,19 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
+          name: rsync-tui
           path: dist
+
+      - name: Prepare files for release
+        shell: bash
+        run: |
+          mkdir -p dist-root
+          cp dist/* dist-root/
+          ls -l dist-root
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/rsync-tui-*
+          files: dist-root/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
