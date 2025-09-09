@@ -6,7 +6,7 @@ permissions:
 on:
   push:
     tags:
-      - 'v*'   # 打 tag 触发，例如 v1.0.0
+      - 'v*'   # 例如 v1.0.0
 
 jobs:
   build:
@@ -33,7 +33,9 @@ jobs:
       - name: Build executable
         shell: bash
         run: |
-          # 设置系统名
+          echo "Runner OS: ${{ runner.os }}"
+          
+          # 根据平台设置系统名和扩展名
           if [[ "${{ runner.os }}" == "Windows" ]]; then
             SYSNAME=windows
             EXT=.exe
@@ -48,13 +50,12 @@ jobs:
           # 用 PyInstaller 打包
           pyinstaller --onefile rsync-tui.py
 
-          # 重命名生成的可执行文件
-          mv dist/rsync-tui${EXT} dist/rsync-tui-${SYSNAME}${EXT}
+          # 带系统名和 tag 重命名
+          TAG_NAME=${GITHUB_REF##*/}
+          mv dist/rsync-tui${EXT} dist/rsync-tui-${SYSNAME}-${TAG_NAME}${EXT}
 
-          # 删除原始文件（如果有）
-          [ -f dist/rsync-tui${EXT} ] && rm dist/rsync-tui${EXT}
-
-          ls dist
+          # 显示结果
+          ls -l dist
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
