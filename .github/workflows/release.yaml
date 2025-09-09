@@ -50,13 +50,17 @@ jobs:
 
           # 重命名生成的可执行文件
           mv dist/rsync-tui${EXT} dist/rsync-tui-${SYSNAME}${EXT}
+
+          # 删除原始文件（如果有）
+          [ -f dist/rsync-tui${EXT} ] && rm dist/rsync-tui${EXT}
+
           ls dist
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: rsync-tui-${{ runner.os }}
-          path: dist/*
+          path: dist/rsync-tui-*
 
   release:
     runs-on: ubuntu-latest
@@ -70,6 +74,6 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/**/*
+          files: dist/rsync-tui-*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
