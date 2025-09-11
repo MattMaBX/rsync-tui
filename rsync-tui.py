@@ -1,4 +1,3 @@
-
 # rsync-tui: 远程文件管理与断点续传 TUI 工具
 # Author: Matt (https://github.com/你的用户名)
 # License: MIT
@@ -180,9 +179,13 @@ async def interactive_browse(user, host, port, start_path):
         'message': 'bg:#444444 #ffffff',
         'output': 'bg:#222222 #00ff00',
     })
+    page_size = 20
+    page_start = 0
     def get_lines(entries, selected, marked):
         lines = []
-        for idx, entry in enumerate(entries):
+        end = min(page_start + page_size, len(entries))
+        for idx in range(page_start, end):
+            entry = entries[idx]
             t = entry['ftype']
             n = entry['name']
             color = 'class:file'
@@ -232,19 +235,41 @@ async def interactive_browse(user, host, port, start_path):
         except Exception:
             pass
     def update_entries():
-        nonlocal entries
+        nonlocal entries, page_start, selected
         entries = get_entries(user, host, port, cwd)
+        page_start = 0
+        selected = 0
     @kb.add('up')
     def _(event):
-        nonlocal selected
+        nonlocal selected, page_start
         if selected > 0:
             selected -= 1
+            if selected < page_start:
+                page_start = max(0, selected)
             refresh(entries, selected, selected_files)
     @kb.add('down')
     def _(event):
-        nonlocal selected
+        nonlocal selected, page_start
         if selected < len(entries) - 1:
             selected += 1
+            if selected >= page_start + page_size:
+                page_start = selected - page_size + 1
+            refresh(entries, selected, selected_files)
+    @kb.add('pageup')
+    def _(event):
+        nonlocal selected, page_start
+        if selected > 0:
+            selected = max(0, selected - page_size)
+            page_start = max(0, page_start - page_size)
+            refresh(entries, selected, selected_files)
+    @kb.add('pagedown')
+    def _(event):
+        nonlocal selected, page_start
+        if selected < len(entries) - 1:
+            selected = min(len(entries) - 1, selected + page_size)
+            page_start = min(max(0, len(entries) - page_size), page_start + page_size)
+            if selected >= page_start + page_size:
+                page_start = selected - page_size + 1
             refresh(entries, selected, selected_files)
     @kb.add('space')
     def _(event):
