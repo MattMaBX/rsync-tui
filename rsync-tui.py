@@ -1,5 +1,5 @@
 # rsync-tui: 远程文件管理与断点续传 TUI 工具
-# Author: Matt (https://github.com/你的用户名)
+# Author: Matt
 # License: MIT
 #
 # 一个基于 prompt_toolkit 的跨平台远程文件管理器，支持 SSH 目录浏览、批量 rsync 下载、断点续传、实时进度输出。
